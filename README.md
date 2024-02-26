@@ -233,7 +233,7 @@
                                                 });
                                             }
 
-                                            document.getElementById("moveForm").addEventListener("submit", function (event) {
+                                        document.getElementById("moveForm").addEventListener("submit", function (event) {
                                         event.preventDefault();
 
                                         const building = document.getElementById("building").value;
