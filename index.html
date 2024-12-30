@@ -185,56 +185,73 @@
     <script>
         let moveList = [];
 
-        // 폼 제출 시 데이터 추가
-        document.getElementById("moveForm").addEventListener("submit", function (e) {
-            e.preventDefault();
+                                            <script>
+                                                let moveList = [];
 
-            const building = document.getElementById("building").value;
-            const seatNumber = document.getElementById("seatNumber").value + document.getElementById("seatNumber2").value;
-            const returnTime = document.getElementById("returnTime").value;
-            const reason = document.getElementById("reason").value;
-            const now = new Date();
-            const date = now.toLocaleDateString();
-            const time = now.toLocaleTimeString();
+                                                function refreshMoveList() {
+                                                    const tableBody = document.querySelector("#moveList tbody");
+                                                    tableBody.innerHTML = "";
 
-            const moveData = {
-                building,
-                seatNumber,
-                returnTime,
-                reason,
-                date,
-                time
-            };
+                                                    moveList.forEach((moveData) => {
+                                                        const row = document.createElement("tr");
+                                                        row.innerHTML = `
+                                                            <td>${moveData.building}</td>
+                                                            <td>${moveData.seatNumber}</td>
+                                                            <td>${moveData.returnTime}교시</td>
+                                                            <td>${moveData.reason}</td>
+                                                            <td>${moveData.inputDate}</td>
+                                                            <td>${moveData.inputTime}</td>
+                                                        `;
+                                                        tableBody.appendChild(row);
+                                                    });
+                                                }
 
-            moveList.push(moveData);
-            refreshMoveList();
-            this.reset();
-        });
+                                                document.getElementById("moveForm").addEventListener("submit", function (event) {
+                                            event.preventDefault();
 
-        // 이동 내역 테이블 갱신
-        function refreshMoveList() {
-            const tableBody = document.querySelector("#moveList tbody");
-            tableBody.innerHTML = "";
+                                            const building = document.getElementById("building").value;
+                                            const seatNumber = document.getElementById("seatNumber").value + document.getElementById("seatNumber2").value;
+                                            const returnTime = document.getElementById("returnTime").value;
+                                            const reason = document.getElementById("reason").value;
 
-            moveList.forEach((moveData) => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${moveData.building}</td>
-                    <td>${moveData.seatNumber}</td>
-                    <td>${moveData.returnTime}</td>
-                    <td>${moveData.reason}</td>
-                    <td>${moveData.date}</td>
-                    <td>${moveData.time}</td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
+                                            const moveData = {
+                                                building: building,
+                                                seatNumber: seatNumber,
+                                                returnTime: returnTime,
+                                                reason: reason
+                                            };
 
-        // 테이블 초기화
+                                            const now = new Date();
+                                            moveData.inputDate = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+                                            moveData.inputTime = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+                                            moveList.push(moveData);
+
+                                        refreshMoveList();
+
+    document.getElementById("moveForm").reset();
+
+    // POST request를 보냄
+    fetch('https://script.google.com/macros/s/AKfycbyNLzJfpqpDT2xIKCE9S3ix15E3gWRAy1gJ_iluIWNQtPT7NamH63mxjiZegyGOs3CH/exec', {
+        method: 'POST',
+        body: JSON.stringify(moveData)
+    });
+});
+
+
         function resetTable() {
             moveList = [];
             refreshMoveList();
         }
     </script>
 </body>
+</html>
+
+
+
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
 </html>
