@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>러셀 이동일지&교육점수 작성</title>
+    <title>러셀 이동일지 작성</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -35,8 +35,8 @@
             padding: 10px;
             margin-bottom: 10px;
             box-sizing: border-box;
-            font-size: 16px;
-            height: 40px;
+            font-size: 16px; /* 선택 박스 내 글자 크기 */
+            height: 40px; /* 선택 박스 높이 */
         }
 
         button {
@@ -72,6 +72,42 @@
             background-color: #f2f2f2;
         }
 
+        @media (max-width: 768px) {
+            form {
+                padding: 15px;
+            }
+
+            button {
+                max-width: 100%;
+            }
+
+            table, th, td {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            form {
+                padding: 10px;
+            }
+
+            select, button {
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+
         .error {
             color: red;
             margin-top: 10px;
@@ -79,16 +115,16 @@
     </style>
 </head>
 <body>
-    <h1>러셀 이동일지&교육점수 작성</h1>
+    <h1>러셀 이동일지 작성</h1>
     <button id="resetButton" onclick="resetTable()">테이블 초기화</button>
     <form id="moveForm">
         <label for="building">관:</label>
-        <select id="building" required>
+        <select id="building" required="">
             <option value="7-1관">7-1관</option>
         </select><br />
 
         <label for="seatNumber">좌석번호:</label>
-        <select id="seatNumber" required>
+        <select id="seatNumber" required="">
             <option value="">선택하세요</option>
             <optgroup label="A~I">
                 <option value="A">A</option>
@@ -100,7 +136,7 @@
             </optgroup>
         </select>
 
-        <select id="seatNumber2" required>
+        <select id="seatNumber2" required="">
             <option value="">선택하세요</option>
             <optgroup label="1~40">
                 <option value="01">01</option>
@@ -113,12 +149,37 @@
                 <option value="08">08</option>
                 <option value="09">09</option>
                 <option value="10">10</option>
-                <!-- Add other numbers as necessary -->
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option>
+                <option value="26">26</option>
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option>
+                <option value="30">30</option>
+                <option value="31">31</option>
+                <option value="32">32</option>
+                <option value="33">33</option>
+                <option value="34">34</option>
+                <option value="35">35</option>
+                <option value="36">36</option>
             </optgroup>
         </select><br />
 
         <label for="returnTime">복귀교시:</label>
-        <select id="returnTime" required>
+        <select id="returnTime" required="">
             <option value="">선택하세요</option>
             <option value="1">1교시</option>
             <option value="2">2교시</option>
@@ -132,7 +193,7 @@
         </select><br />
 
         <label for="reason">이동사유:</label>
-        <select id="reason" required>
+        <select id="reason" required="true">
             <option value="">선택하세요</option>
             <option value="화장실/정수기">화장실/정수기</option>
             <option value="튜터 질의응답">튜터 질의응답</option>
@@ -146,20 +207,11 @@
             <option value="지각">지각</option>
             <option value="입/퇴실 미준수">입/퇴실 미준수</option>
             <option value="핸드폰 미제출">핸드폰 미제출</option>
-            <option value="전자기기 무단사용">전자기기 무단사용</option>
+            <option value="전자기기 사용">전자기기 사용</option>
             <option value="핸드폰 무단사용">핸드폰 무단사용</option>
             <option value="타층/타관 무단출입">타층/타관 무단출입</option>
             <option value="무단결석/무단이탈">무단결석/무단이탈</option>
             <option value="원내 대화">원내 대화</option>
-        </select><br />
-
-        <label for="repeatCount" id="repeatCountLabel" style="display:none;">반복 입력 횟수:</label>
-        <select id="repeatCount" style="display:none;">
-            <option value="1">1회</option>
-            <option value="2">2회</option>
-            <option value="3">3회</option>
-            <option value="4">4회</option>
-            <option value="5">5회</option>
         </select><br />
 
         <label for="otherReason" id="otherReasonLabel" style="display:none;">기타 사유:</label>
@@ -215,7 +267,6 @@
             const seatNumber = document.getElementById("seatNumber").value + document.getElementById("seatNumber2").value;
             const returnTime = document.getElementById("returnTime").value;
             const reason = document.getElementById("reason").value;
-            const repeatCount = document.getElementById("repeatCount").value || 1;
             const otherReason = document.getElementById("otherReason").value;
 
             if (reason === "기타" && !otherReason.trim()) {
@@ -225,27 +276,24 @@
                 document.getElementById("errorMessage").style.display = "none";
             }
 
-            for (let i = 0; i < repeatCount; i++) {
-                const moveData = {
-                    building: building,
-                    seatNumber: seatNumber,
-                    returnTime: returnTime,
-                    reason: reason === "기타" ? otherReason : reason
-                };
+            const moveData = {
+                building: building,
+                seatNumber: seatNumber,
+                returnTime: returnTime,
+                reason: reason === "기타" ? otherReason : reason // "기타"일 경우 입력된 기타 사유 사용
+            };
 
-                const now = new Date();
-                moveData.inputDate = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
-                moveData.inputTime = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+            const now = new Date();
+            moveData.inputDate = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+            moveData.inputTime = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-                moveList.push(moveData);
-            }
+            moveList.push(moveData);
 
             refreshMoveList();
+
             document.getElementById("moveForm").reset();
             document.getElementById("otherReason").style.display = "none";
             document.getElementById("otherReasonLabel").style.display = "none";
-            document.getElementById("repeatCount").style.display = "none";
-            document.getElementById("repeatCountLabel").style.display = "none";
 
             fetch('https://script.google.com/macros/s/AKfycbyNLzJfpqpDT2xIKCE9S3ix15E3gWRAy1gJ_iluIWNQtPT7NamH63mxjiZegyGOs3CH/exec', {
                 method: 'POST',
@@ -253,17 +301,9 @@
             });
         });
 
-        document.getElementById("reason").addEventListener("change", function () {
-            const reason = this.value;
-            if (["지각", "핸드폰 미제출", "전자기기 무단사용", "핸드폰 무단사용", "타층/타관 무단출입", "무단결석/무단이탈", "원내 대화"].includes(reason)) {
-                document.getElementById("repeatCount").style.display = "block";
-                document.getElementById("repeatCountLabel").style.display = "block";
-            } else {
-                document.getElementById("repeatCount").style.display = "none";
-                document.getElementById("repeatCountLabel").style.display = "none";
-            }
-
-            if (reason === "기타") {
+        // "기타" 이동사유 선택 시 사유 입력 필드 표시
+        document.getElementById("reason").addEventListener("change", function() {
+            if (this.value === "기타") {
                 document.getElementById("otherReason").style.display = "block";
                 document.getElementById("otherReasonLabel").style.display = "block";
             } else {
@@ -280,7 +320,6 @@
     </script>
 </body>
 </html>
-
 
 
 
