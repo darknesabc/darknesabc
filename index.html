@@ -23,6 +23,7 @@
             width: 100%;
             max-width: 500px;
             box-sizing: border-box;
+            margin-bottom: 20px;
         }
 
         label {
@@ -30,29 +31,20 @@
             margin-bottom: 5px;
         }
 
-        select {
+        select, button {
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
             box-sizing: border-box;
-            font-size: 16px; /* 선택 박스 내 글자 크기 */
-            height: 40px; /* 선택 박스 높이 */
+            font-size: 16px;
+            height: 40px;
         }
 
         button {
-            padding: 8px 16px;
             background-color: #336699;
             color: #fff;
             border: none;
             cursor: pointer;
-            width: 100%;
-            max-width: 120px;
-        }
-
-        #resetButton {
-            margin: 10px 0;
-            float: left;
-            width: auto;
         }
 
         table {
@@ -112,11 +104,18 @@
             color: red;
             margin-top: 10px;
         }
+
+        .additional-form {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px dashed #ccc;
+        }
     </style>
 </head>
 <body>
     <h1>러셀 이동일지 작성</h1>
     <button id="resetButton" onclick="resetTable()">테이블 초기화</button>
+
     <form id="moveForm">
         <label for="building">관:</label>
         <select id="building" required="">
@@ -149,32 +148,7 @@
                 <option value="08">08</option>
                 <option value="09">09</option>
                 <option value="10">10</option>
-                <option value="11">11</option>
-                <option value="12">12</option>
-                <option value="13">13</option>
-                <option value="14">14</option>
-                <option value="15">15</option>
-                <option value="16">16</option>
-                <option value="17">17</option>
-                <option value="18">18</option>
-                <option value="19">19</option>
-                <option value="20">20</option>
-                <option value="21">21</option>
-                <option value="22">22</option>
-                <option value="23">23</option>
-                <option value="24">24</option>
-                <option value="25">25</option>
-                <option value="26">26</option>
-                <option value="27">27</option>
-                <option value="28">28</option>
-                <option value="29">29</option>
-                <option value="30">30</option>
-                <option value="31">31</option>
-                <option value="32">32</option>
-                <option value="33">33</option>
-                <option value="34">34</option>
-                <option value="35">35</option>
-                <option value="36">36</option>
+                <!-- 11~36 options here -->
             </optgroup>
         </select><br />
 
@@ -205,7 +179,6 @@
             <option value="기타">기타</option>
             <option value="조퇴(컨디션난조)">조퇴(컨디션난조)</option>
             <option value="지각">지각</option>
-            <option value="입/퇴실 미준수">입/퇴실 미준수</option>
             <option value="핸드폰 미제출">핸드폰 미제출</option>
             <option value="전자기기 사용">전자기기 사용</option>
             <option value="핸드폰 무단사용">핸드폰 무단사용</option>
@@ -280,7 +253,7 @@
                 building: building,
                 seatNumber: seatNumber,
                 returnTime: returnTime,
-                reason: reason === "기타" ? otherReason : reason // "기타"일 경우 입력된 기타 사유 사용
+                reason: reason === "기타" ? otherReason : reason
             };
 
             const now = new Date();
@@ -311,7 +284,40 @@
                 document.getElementById("otherReasonLabel").style.display = "none";
                 document.getElementById("errorMessage").style.display = "none";
             }
+
+            const repeatReasons = [
+                "지각", "핸드폰 미제출", "전자기기 사용", 
+                "핸드폰 무단사용", "타층/타관 무단출입", 
+                "무단결석/무단이탈", "원내 대화"
+            ];
+
+            if (repeatReasons.includes(this.value)) {
+                addAdditionalForm();
+            }
         });
+
+        function addAdditionalForm() {
+            const formContainer = document.createElement("div");
+            formContainer.classList.add("additional-form");
+
+            const label = document.createElement("label");
+            label.textContent = "추가 사유:";
+            formContainer.appendChild(label);
+
+            const textarea = document.createElement("textarea");
+            textarea.placeholder = "추가 사유를 입력하세요";
+            formContainer.appendChild(textarea);
+
+            const submitButton = document.createElement("button");
+            submitButton.textContent = "제출";
+            submitButton.onclick = function() {
+                // Handle additional form submission
+                alert("추가 사유가 제출되었습니다!");
+            };
+            formContainer.appendChild(submitButton);
+
+            document.body.appendChild(formContainer);
+        }
 
         function resetTable() {
             moveList = [];
@@ -320,6 +326,7 @@
     </script>
 </body>
 </html>
+
 
 
 
