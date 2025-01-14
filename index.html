@@ -5,7 +5,113 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>러셀 이동일지 작성</title>
     <style>
-        /* 기존 스타일 그대로 유지 */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #336699;
+        }
+
+        form {
+            display: inline-block;
+            text-align: left;
+            border: 1px solid #ccc;
+            padding: 10px;
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            font-size: 16px; /* 선택 박스 내 글자 크기 */
+            height: 40px; /* 선택 박스 높이 */
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #336699;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            max-width: 120px;
+        }
+
+        #resetButton {
+            margin: 10px 0;
+            float: left;
+            width: auto;
+        }
+
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        thead {
+            background-color: #f2f2f2;
+        }
+
+        @media (max-width: 768px) {
+            form {
+                padding: 15px;
+            }
+
+            button {
+                max-width: 100%;
+            }
+
+            table, th, td {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            form {
+                padding: 10px;
+            }
+
+            select, button {
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -108,8 +214,8 @@
             <option value="원내 대화">원내 대화</option>
         </select><br />
 
-        <label for="repeatCount">입력 횟수:</label>
-        <input type="number" id="repeatCount" value="1" min="1" max="5" /><br />
+        <label for="otherReason" id="otherReasonLabel" style="display:none;">기타 사유:</label>
+        <textarea id="otherReason" placeholder="기타 사유를 입력하세요" style="display:none; width: 100%; height: 100px; resize: vertical;"></textarea>
 
         <button type="submit">제출</button>
     </form>
@@ -161,8 +267,6 @@
             const seatNumber = document.getElementById("seatNumber").value + document.getElementById("seatNumber2").value;
             const returnTime = document.getElementById("returnTime").value;
             const reason = document.getElementById("reason").value;
-            const repeatCount = parseInt(document.getElementById("repeatCount").value);
-
             const otherReason = document.getElementById("otherReason").value;
 
             if (reason === "기타" && !otherReason.trim()) {
@@ -183,16 +287,30 @@
             moveData.inputDate = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
             moveData.inputTime = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-            // 선택된 횟수만큼 moveData 객체를 추가
-            for (let i = 0; i < repeatCount; i++) {
-                moveList.push({...moveData});
-            }
+            moveList.push(moveData);
 
             refreshMoveList();
 
             document.getElementById("moveForm").reset();
             document.getElementById("otherReason").style.display = "none";
             document.getElementById("otherReasonLabel").style.display = "none";
+
+            fetch('https://script.google.com/macros/s/AKfycbyNLzJfpqpDT2xIKCE9S3ix15E3gWRAy1gJ_iluIWNQtPT7NamH63mxjiZegyGOs3CH/exec', {
+                method: 'POST',
+                body: JSON.stringify(moveData)
+            });
+        });
+
+        // "기타" 이동사유 선택 시 사유 입력 필드 표시
+        document.getElementById("reason").addEventListener("change", function() {
+            if (this.value === "기타") {
+                document.getElementById("otherReason").style.display = "block";
+                document.getElementById("otherReasonLabel").style.display = "block";
+            } else {
+                document.getElementById("otherReason").style.display = "none";
+                document.getElementById("otherReasonLabel").style.display = "none";
+                document.getElementById("errorMessage").style.display = "none";
+            }
         });
 
         function resetTable() {
@@ -201,4 +319,14 @@
         }
     </script>
 </body>
+</html>
+
+
+
+
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
 </html>
