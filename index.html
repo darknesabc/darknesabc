@@ -35,8 +35,8 @@
             padding: 10px;
             margin-bottom: 10px;
             box-sizing: border-box;
-            font-size: 16px; /* 선택 박스 내 글자 크기 */
-            height: 40px; /* 선택 박스 높이 */
+            font-size: 16px;
+            height: 40px;
         }
 
         button {
@@ -214,6 +214,9 @@
             <option value="원내 대화">원내 대화</option>
         </select><br />
 
+        <label for="repeatCount" id="repeatCountLabel" style="display:none;">반복횟수:</label>
+        <input type="number" id="repeatCount" style="display:none;" min="1" max="10" value="1" /><br />
+
         <label for="otherReason" id="otherReasonLabel" style="display:none;">기타 사유:</label>
         <textarea id="otherReason" placeholder="기타 사유를 입력하세요" style="display:none; width: 100%; height: 100px; resize: vertical;"></textarea>
 
@@ -268,6 +271,7 @@
             const returnTime = document.getElementById("returnTime").value;
             const reason = document.getElementById("reason").value;
             const otherReason = document.getElementById("otherReason").value;
+            const repeatCount = parseInt(document.getElementById("repeatCount").value, 10) || 1;
 
             if (reason === "기타" && !otherReason.trim()) {
                 document.getElementById("errorMessage").style.display = "block";
@@ -276,24 +280,29 @@
                 document.getElementById("errorMessage").style.display = "none";
             }
 
-            const moveData = {
-                building: building,
-                seatNumber: seatNumber,
-                returnTime: returnTime,
-                reason: reason === "기타" ? otherReason : reason // "기타"일 경우 입력된 기타 사유 사용
-            };
+            // 반복 횟수만큼 동일한 데이터를 추가
+            for (let i = 0; i < repeatCount; i++) {
+                const moveData = {
+                    building: building,
+                    seatNumber: seatNumber,
+                    returnTime: returnTime,
+                    reason: reason === "기타" ? otherReason : reason
+                };
 
-            const now = new Date();
-            moveData.inputDate = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
-            moveData.inputTime = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+                const now = new Date();
+                moveData.inputDate = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+                moveData.inputTime = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-            moveList.push(moveData);
+                moveList.push(moveData);
+            }
 
             refreshMoveList();
 
             document.getElementById("moveForm").reset();
             document.getElementById("otherReason").style.display = "none";
             document.getElementById("otherReasonLabel").style.display = "none";
+            document.getElementById("repeatCount").style.display = "none";
+            document.getElementById("repeatCountLabel").style.display = "none";
 
             fetch('https://script.google.com/macros/s/AKfycbyNLzJfpqpDT2xIKCE9S3ix15E3gWRAy1gJ_iluIWNQtPT7NamH63mxjiZegyGOs3CH/exec', {
                 method: 'POST',
@@ -301,9 +310,22 @@
             });
         });
 
-        // "기타" 이동사유 선택 시 사유 입력 필드 표시
         document.getElementById("reason").addEventListener("change", function() {
-            if (this.value === "기타") {
+            const reason = this.value;
+            const repeatableReasons = [
+                "지각", "전자기기 사용", "핸드폰 미제출", "핸드폰 사용", 
+                "타층/타관 무단출입", "무단결석/무단이탈", "원내 대화"
+            ];
+
+            if (repeatableReasons.includes(reason)) {
+                document.getElementById("repeatCount").style.display = "inline";
+                document.getElementById("repeatCountLabel").style.display = "inline";
+            } else {
+                document.getElementById("repeatCount").style.display = "none";
+                document.getElementById("repeatCountLabel").style.display = "none";
+            }
+
+            if (reason === "기타") {
                 document.getElementById("otherReason").style.display = "block";
                 document.getElementById("otherReasonLabel").style.display = "block";
             } else {
@@ -320,6 +342,7 @@
     </script>
 </body>
 </html>
+
 
 
 
