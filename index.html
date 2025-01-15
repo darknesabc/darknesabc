@@ -305,7 +305,7 @@
         seatNumber: seatNumber,
         returnTime: returnTime,
         reason: reason === "기타" ? otherReason : reason,
-        score: ["핸드폰 미제출", "전자기기 무단사용", "핸드폰 무단사용", "타층/타관 무단출입", "무단결석/무단이탈", "원내 대화"].includes(reason) ? score : null,
+        score: ["핸드폰 미제출", "전자기기 무단단사용", "핸드폰 무단사용", "타층/타관 무단출입", "무단결석/무단이탈", "원내 대화"].includes(reason) ? score : null,
         inputDate: inputDate,
         inputTime: inputTime
     };
@@ -357,7 +357,7 @@ function refreshMoveList() {
 
 
         document.getElementById("reason").addEventListener("change", function() {
-            if (["핸드폰 미제출", "전자기기 사용", "핸드폰 무단사용", "타층/타관 무단출입", "무단결석/무단이탈", "원내 대화"].includes(this.value)) {
+            if (["핸드폰 미제출", "전자기기 무단사용", "핸드폰 무단사용", "타층/타관 무단출입", "무단결석/무단이탈", "원내 대화"].includes(this.value)) {
                 document.getElementById("scoreDiv").style.display = "block";
             } else {
                 document.getElementById("scoreDiv").style.display = "none";
