@@ -295,17 +295,17 @@
         document.getElementById("errorMessage").style.display = "none";
     }
 
-    // 날짜와 시간 설정
+    // 날짜와 시간 설정 (초 단위까지)
     const now = new Date();
     const inputDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    const inputTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const inputTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
 
     const moveData = {
         building: building,
         seatNumber: seatNumber,
         returnTime: returnTime,
         reason: reason === "기타" ? otherReason : reason,
-        score: ["핸드폰 미제출", "전자기기 무단단사용", "핸드폰 무단사용", "타층/타관 무단출입", "무단결석/무단이탈", "원내 대화"].includes(reason) ? score : null,
+        score: ["핸드폰 미제출", "전자기기 사용", "핸드폰 무단사용", "타층/타관 무단출입", "무단결석/무단이탈", "원내 대화"].includes(reason) ? score : null,
         inputDate: inputDate,
         inputTime: inputTime
     };
@@ -316,7 +316,18 @@
         moveList.push(duplicatedMoveData);
     }
 
-    refreshMoveList();
+    // 테이블 내림차순 정렬 후 갱신
+    moveList.sort((a, b) => {
+        if (a.inputTime > b.inputTime) {
+            return -1;  // a가 b보다 나중에 제출된 경우 (내림차순)
+        }
+        if (a.inputTime < b.inputTime) {
+            return 1;   // a가 b보다 먼저 제출된 경우
+        }
+        return 0;  // 동일한 시간이면 변경 없음
+    });
+
+    refreshMoveList();  // 데이터 갱신
 
     document.getElementById("moveForm").reset();
     document.getElementById("scoreDiv").style.display = "none";
@@ -326,13 +337,33 @@
     // 점수만큼 데이터를 중복시켜 서버로 전송, 2초 간격으로 요청 보내기
     for (let i = 0; i < parseInt(score); i++) {
         setTimeout(() => {
-            fetch('https://script.google.com/macros/s/AKfycbyNLzJfpqpDT2xIKCE9S3ix15E3gWRAy1gJ_iluIWNQtPT7NamH63mxjiZegyGOs3CH/exec', {
+            fetch('https://script.google.com/macros/s/AKfycbwMm1kYD4_RmxI1wU-dGJVCO-3C_Es9sQKFKn-VXN82r39WdohWw3rPdsJHQjV8F-A_/exec', {
                 method: 'POST',
                 body: JSON.stringify(moveData)
             });
         }, i * 2000);  // 2초 간격으로 전송
     }
 });
+
+// 테이블에 데이터 표시하는 함수 (초 단위까지 반영)
+function refreshMoveList() {
+    const tableBody = document.querySelector("#moveList tbody");
+    tableBody.innerHTML = "";
+
+    moveList.forEach((moveData) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${moveData.building}</td>
+            <td>${moveData.seatNumber}</td>
+            <td>${moveData.returnTime}교시</td>
+            <td>${moveData.reason}</td>
+            <td>${moveData.inputDate}</td>
+            <td>${moveData.inputTime}</td>
+            <td>${moveData.score || '-'}</td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
 
 
 function refreshMoveList() {
