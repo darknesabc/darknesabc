@@ -326,7 +326,7 @@
     // 점수만큼 데이터를 중복시켜 서버로 전송, 2초 간격으로 요청 보내기
     for (let i = 0; i < parseInt(score); i++) {
         setTimeout(() => {
-            fetch('https://script.google.com/macros/s/AKfycbwMm1kYD4_RmxI1wU-dGJVCO-3C_Es9sQKFKn-VXN82r39WdohWw3rPdsJHQjV8F-A_/exec', {
+            fetch('https://script.google.com/macros/s/AKfycbyNLzJfpqpDT2xIKCE9S3ix15E3gWRAy1gJ_iluIWNQtPT7NamH63mxjiZegyGOs3CH/exec', {
                 method: 'POST',
                 body: JSON.stringify(moveData)
             });
