@@ -112,19 +112,23 @@
             color: red;
             margin-top: 10px;
         }
+
+        .score {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <h1>러셀 이동일지 작성</h1>
+    <h1>러셀 이동일지&교육점수 작성</h1>
     <button id="resetButton" onclick="resetTable()">테이블 초기화</button>
     <form id="moveForm">
         <label for="building">관:</label>
-        <select id="building" required="">
+        <select id="building" required="true">
             <option value="7-1관">7-1관</option>
         </select><br />
 
         <label for="seatNumber">좌석번호:</label>
-        <select id="seatNumber" required="">
+        <select id="seatNumber" required="true">
             <option value="">선택하세요</option>
             <optgroup label="A~I">
                 <option value="A">A</option>
@@ -136,7 +140,7 @@
             </optgroup>
         </select>
 
-        <select id="seatNumber2" required="">
+        <select id="seatNumber2" required="true">
             <option value="">선택하세요</option>
             <optgroup label="1~40">
                 <option value="01">01</option>
@@ -179,7 +183,7 @@
         </select><br />
 
         <label for="returnTime">복귀교시:</label>
-        <select id="returnTime" required="">
+        <select id="returnTime" required="true">
             <option value="">선택하세요</option>
             <option value="1">1교시</option>
             <option value="2">2교시</option>
@@ -213,6 +217,18 @@
             <option value="무단결석/무단이탈">무단결석/무단이탈</option>
             <option value="원내 대화">원내 대화</option>
         </select><br />
+
+        <div id="scoreDiv" class="score">
+            <label for="score">점수 (1~5점):</label>
+            <select id="score">
+                <option value="">선택하세요</option>
+                <option value="1">1점</option>
+                <option value="2">2점</option>
+                <option value="3">3점</option>
+                <option value="4">4점</option>
+                <option value="5">5점</option>
+            </select><br />
+        </div>
 
         <label for="otherReason" id="otherReasonLabel" style="display:none;">기타 사유:</label>
         <textarea id="otherReason" placeholder="기타 사유를 입력하세요" style="display:none; width: 100%; height: 100px; resize: vertical;"></textarea>
@@ -255,54 +271,96 @@
                     <td>${moveData.reason}</td>
                     <td>${moveData.inputDate}</td>
                     <td>${moveData.inputTime}</td>
+                    <td>${moveData.score || '-'}</td>
                 `;
                 tableBody.appendChild(row);
             });
         }
 
         document.getElementById("moveForm").addEventListener("submit", function (event) {
-            event.preventDefault();
+    event.preventDefault();
 
-            const building = document.getElementById("building").value;
-            const seatNumber = document.getElementById("seatNumber").value + document.getElementById("seatNumber2").value;
-            const returnTime = document.getElementById("returnTime").value;
-            const reason = document.getElementById("reason").value;
-            const otherReason = document.getElementById("otherReason").value;
+    const building = document.getElementById("building").value;
+    const seatNumber = document.getElementById("seatNumber").value + document.getElementById("seatNumber2").value;
+    const returnTime = document.getElementById("returnTime").value;
+    const reason = document.getElementById("reason").value;
+    const otherReason = document.getElementById("otherReason").value;
+    const score = document.getElementById("score").value;
 
-            if (reason === "기타" && !otherReason.trim()) {
-                document.getElementById("errorMessage").style.display = "block";
-                return;
+    // 기타 사유가 비어있는지 체크
+    if (reason === "기타" && !otherReason.trim()) {
+        document.getElementById("errorMessage").style.display = "block";
+        return;
+    } else {
+        document.getElementById("errorMessage").style.display = "none";
+    }
+
+    // 날짜와 시간 설정
+    const now = new Date();
+    const inputDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const inputTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    const moveData = {
+        building: building,
+        seatNumber: seatNumber,
+        returnTime: returnTime,
+        reason: reason === "기타" ? otherReason : reason,
+        score: ["핸드폰 미제출", "전자기기 사용", "핸드폰 무단사용", "타층/타관 무단출입", "무단결석/무단이탈", "원내 대화"].includes(reason) ? score : null,
+        inputDate: inputDate,
+        inputTime: inputTime
+    };
+
+    // 동일한 사유가 점수에 따라 여러 번 추가되도록 처리
+    for (let i = 0; i < parseInt(score); i++) {
+        const duplicatedMoveData = { ...moveData, score: moveData.score };  // 점수를 기준으로 복제
+        moveList.push(duplicatedMoveData);
+    }
+
+    refreshMoveList();
+
+    document.getElementById("moveForm").reset();
+    document.getElementById("scoreDiv").style.display = "none";
+    document.getElementById("otherReason").style.display = "none";
+    document.getElementById("otherReasonLabel").style.display = "none";
+
+    // 점수만큼 데이터를 중복시켜 서버로 전송
+    for (let i = 0; i < parseInt(score); i++) {
+        fetch('https://script.google.com/macros/s/AKfycbyNLzJfpqpDT2xIKCE9S3ix15E3gWRAy1gJ_iluIWNQtPT7NamH63mxjiZegyGOs3CH/exec', {
+            method: 'POST',
+            body: JSON.stringify(moveData)
+        });
+    }
+});
+
+
+function refreshMoveList() {
+    const tableBody = document.querySelector("#moveList tbody");
+    tableBody.innerHTML = "";
+
+    moveList.forEach((moveData) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${moveData.building}</td>
+            <td>${moveData.seatNumber}</td>
+            <td>${moveData.returnTime}교시</td>
+            <td>${moveData.reason}</td>
+            <td>${moveData.inputDate}</td>
+            <td>${moveData.inputTime}</td>
+            <td>${moveData.score || '-'}</td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+
+
+        document.getElementById("reason").addEventListener("change", function() {
+            if (["핸드폰 미제출", "전자기기 사용", "핸드폰 무단사용", "타층/타관 무단출입", "무단결석/무단이탈", "원내 대화"].includes(this.value)) {
+                document.getElementById("scoreDiv").style.display = "block";
             } else {
-                document.getElementById("errorMessage").style.display = "none";
+                document.getElementById("scoreDiv").style.display = "none";
             }
 
-            const moveData = {
-                building: building,
-                seatNumber: seatNumber,
-                returnTime: returnTime,
-                reason: reason === "기타" ? otherReason : reason // "기타"일 경우 입력된 기타 사유 사용
-            };
-
-            const now = new Date();
-            moveData.inputDate = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
-            moveData.inputTime = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-            moveList.push(moveData);
-
-            refreshMoveList();
-
-            document.getElementById("moveForm").reset();
-            document.getElementById("otherReason").style.display = "none";
-            document.getElementById("otherReasonLabel").style.display = "none";
-
-            fetch('https://script.google.com/macros/s/AKfycbyNLzJfpqpDT2xIKCE9S3ix15E3gWRAy1gJ_iluIWNQtPT7NamH63mxjiZegyGOs3CH/exec', {
-                method: 'POST',
-                body: JSON.stringify(moveData)
-            });
-        });
-
-        // "기타" 이동사유 선택 시 사유 입력 필드 표시
-        document.getElementById("reason").addEventListener("change", function() {
             if (this.value === "기타") {
                 document.getElementById("otherReason").style.display = "block";
                 document.getElementById("otherReasonLabel").style.display = "block";
@@ -319,14 +377,4 @@
         }
     </script>
 </body>
-</html>
-
-
-
-
-
-    </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
-    <script>anchors.add();</script>
-  </body>
 </html>
